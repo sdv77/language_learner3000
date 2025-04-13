@@ -1,7 +1,21 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:language_learner3000/models/user_model.dart';
 
 class UserViewModel {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  Future<UserModel?> getUser(String userId) async {
+    try {
+      DocumentSnapshot userDoc = await _firestore.collection('users').doc(userId).get();
+      if (userDoc.exists) {
+        return UserModel.fromMap(userDoc.id, userDoc.data() as Map<String, dynamic>);
+      }
+      return null;
+    } catch (e) {
+      print("Error fetching user data: $e");
+      rethrow;
+    }
+  }
 
   Future<void> addCompletedLesson(String userId, String lessonId) async {
     try {

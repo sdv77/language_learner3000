@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../views/add_lesson_screen.dart';
 import '../views/lessons_screen.dart';
+import '../views/profile_screen.dart';
 
 class TeacherScreen extends StatelessWidget {
   final String userId;
@@ -10,7 +11,22 @@ class TeacherScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Teacher Home')),
+      appBar: AppBar(
+        title: Text('Teacher Home'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.person),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ProfileScreen(userId: userId),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
