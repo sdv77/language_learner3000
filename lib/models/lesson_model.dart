@@ -29,11 +29,15 @@ class LessonPage {
 class Lesson {
   final String id;
   final String title;
+  final String description;
+  final String imageUrl;
   final List<LessonPage> pages;
 
   Lesson({
     required this.id,
     required this.title,
+    required this.description,
+    required this.imageUrl,
     required this.pages,
   });
 
@@ -41,6 +45,8 @@ class Lesson {
     return {
       'id': id,
       'title': title,
+      'description': description,
+      'imageUrl': imageUrl,
       'pages': pages.map((page) => page.toMap()).toList(),
     };
   }
@@ -49,6 +55,8 @@ class Lesson {
     return Lesson(
       id: id,
       title: data['title'],
+      description: data['description'],
+      imageUrl: data['imageUrl'],
       pages: (data['pages'] as List)
           .map((page) => LessonPage.fromMap(page))
           .toList(),

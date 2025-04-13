@@ -40,7 +40,9 @@ class _LessonsScreenState extends State<LessonsScreen> {
                 return Card(
                   margin: EdgeInsets.all(8),
                   child: ListTile(
+                    leading: Image.network(lesson.imageUrl),
                     title: Text(lesson.title),
+                    subtitle: Text(lesson.description),
                     onTap: () {
                       Navigator.push(
                         context,

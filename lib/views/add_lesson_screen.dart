@@ -10,6 +10,8 @@ class AddLessonScreen extends StatefulWidget {
 class _AddLessonScreenState extends State<AddLessonScreen> {
   final TeacherViewModel _teacherViewModel = TeacherViewModel();
   final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _imageUrlController = TextEditingController();
   final List<Map<String, String>> _pages = [];
 
   void _addPage() {
@@ -32,7 +34,12 @@ class _AddLessonScreenState extends State<AddLessonScreen> {
         );
       }).toList();
 
-      await _teacherViewModel.addLesson(_titleController.text, pages);
+      await _teacherViewModel.addLesson(
+        _titleController.text,
+        _descriptionController.text,
+        _imageUrlController.text,
+        pages,
+      );
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Lesson added successfully!')),
       );
@@ -54,7 +61,15 @@ class _AddLessonScreenState extends State<AddLessonScreen> {
           children: [
             TextField(
               controller: _titleController,
-              decoration: InputDecoration(labelText: 'Lesson Title'),
+              decoration: InputDecoration(labelText: 'Title'),
+            ),
+            TextField(
+              controller: _descriptionController,
+              decoration: InputDecoration(labelText: 'Description'),
+            ),
+            TextField(
+              controller: _imageUrlController,
+              decoration: InputDecoration(labelText: 'Image URL'),
             ),
             Expanded(
               child: ListView.builder(
@@ -66,7 +81,7 @@ class _AddLessonScreenState extends State<AddLessonScreen> {
                         onChanged: (value) {
                           _pages[index]['imageUrl'] = value;
                         },
-                        decoration: InputDecoration(labelText: 'Image URL'),
+                        decoration: InputDecoration(labelText: 'Page Image URL'),
                       ),
                       TextField(
                         onChanged: (value) {
