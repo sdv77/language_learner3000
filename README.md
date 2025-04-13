@@ -2,6 +2,11 @@
 
 Flutter app for learning language
 
+![Dart](https://img.shields.io/badge/dart-%230175C2.svg?style=for-the-badge&logo=dart&logoColor=white)
+![Flutter](https://img.shields.io/badge/Flutter-%2302569B.svg?style=for-the-badge&logo=Flutter&logoColor=white)
+![Firebase](https://img.shields.io/badge/firebase-a08021?style=for-the-badge&logo=firebase&logoColor=ffcd34)
+
+
 ## How to run app?
 
 1) Clone repository `git clone https://github.com/sdv77/language_learner3000.git` or use Github Desktop
@@ -18,8 +23,8 @@ STORAGE_BUCKET=STORAGE_BUCKET
 5) Run the app with `flutter run`
 
 ## Requires
-1) Flutter
-2) Firebase project
+1) [Flutter SDK](https://docs.flutter.dev/get-started/install)
+2) [Firebase project](https://console.firebase.google.com/u/0/?hl=ru)
    - Firestore
    - Email/Password authentication
   
