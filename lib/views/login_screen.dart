@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:language_learner3000/models/user_model.dart';
 import '../viewmodels/auth_viewmodel.dart';
-import 'home_screen.dart';
-import 'teacher_screen.dart';
-import 'admin_screen.dart';
+import '../views/home_screen.dart';
+import '../views/teacher_screen.dart';
+import '../views/admin_screen.dart';
+import '../models/user_model.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -16,32 +16,37 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _passwordController = TextEditingController();
 
   Future<void> _login() async {
-    try {
-      UserModel? user = await _authViewModel.signIn(
-        _emailController.text.trim(),
-        _passwordController.text.trim(),
+  try {
+    UserModel? user = await _authViewModel.signIn(
+      _emailController.text.trim(),
+      _passwordController.text.trim(),
+      context, // Передаем контекст для отображения ошибок
+    );
+    if (user != null) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => _getScreenByRole(user.role, user.uid),
+        ),
       );
-      if (user != null) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => _getScreenByRole(user.role),
-          ),
-        );
-      }
-    } catch (e) {
+    } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.toString())),
+        SnackBar(content: Text('Invalid credentials')),
       );
     }
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Error during login: $e')),
+    );
   }
+}
 
   Future<void> _register() async {
     try {
       await _authViewModel.register(
         _emailController.text.trim(),
         _passwordController.text.trim(),
-        'user', // Роль по умолчанию
+        'user',
       );
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Account registered! Please verify your email.')),
@@ -66,16 +71,16 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  Widget _getScreenByRole(String role) {
+  Widget _getScreenByRole(String role, String userId) {
     switch (role) {
       case 'user':
-        return HomeScreen();
+        return HomeScreen(userId: userId);
       case 'teacher':
-        return TeacherScreen();
+        return TeacherScreen(userId: userId);
       case 'admin':
         return AdminScreen();
       default:
-        return HomeScreen();
+        return HomeScreen(userId: userId);
     }
   }
 

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import '../viewmodels/admin_viewmodel.dart';
 import '../models/user_model.dart';
 
 class ManageUsersScreen extends StatefulWidget {
@@ -8,14 +8,20 @@ class ManageUsersScreen extends StatefulWidget {
 }
 
 class _ManageUsersScreenState extends State<ManageUsersScreen> {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final AdminViewModel _adminViewModel = AdminViewModel();
+  late Future<List<UserModel>> _usersFuture;
   final TextEditingController _searchController = TextEditingController();
-  String _searchQuery = '';
 
   @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
+  void initState() {
+    super.initState();
+    _usersFuture = _adminViewModel.getUsers();
+  }
+
+  Future<void> _searchUsers() async {
+    setState(() {
+      _usersFuture = _adminViewModel.searchUsers(_searchController.text.trim());
+    });
   }
 
   @override
@@ -23,155 +29,77 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Manage Users'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.search),
+            onPressed: _searchUsers,
+          ),
+        ],
       ),
       body: Column(
         children: [
-          // Поле поиска
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(8.0),
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(
                 labelText: 'Search by email',
-                prefixIcon: Icon(Icons.search),
+                suffixIcon: IconButton(
+                  icon: Icon(Icons.clear),
+                  onPressed: () {
+                    _searchController.clear();
+                    setState(() {
+                      _usersFuture = _adminViewModel.getUsers();
+                    });
+                  },
+                ),
               ),
-              onChanged: (value) {
-                setState(() {
-                  _searchQuery = value.toLowerCase();
-                });
-              },
             ),
           ),
-
-          // Список пользователей
           Expanded(
-            child: StreamBuilder<QuerySnapshot>(
-              stream: _firestore
-                  .collection('users')
-                  .where('role', isNotEqualTo: 'admin') // Исключаем администраторов
-                  .snapshots(),
+            child: FutureBuilder<List<UserModel>>(
+              future: _usersFuture,
               builder: (context, snapshot) {
-                if (!snapshot.hasData) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
                   return Center(child: CircularProgressIndicator());
-                }
-
-                // Фильтрация по email
-                final filteredUsers = snapshot.data!.docs.where((doc) {
-                  final email = doc['email'].toString().toLowerCase();
-                  return email.contains(_searchQuery);
-                }).toList();
-
-                if (filteredUsers.isEmpty) {
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                   return Center(child: Text('No users found.'));
+                } else {
+                  List<UserModel> users = snapshot.data!;
+                  return ListView.builder(
+                    itemCount: users.length,
+                    itemBuilder: (context, index) {
+                      UserModel user = users[index];
+                      return ListTile(
+                        title: Text(user.email),
+                        subtitle: Text('Role: ${user.role.capitalize()}'),
+                        trailing: DropdownButton<String>(
+                          value: user.role,
+                          onChanged: (String? newRole) async {
+                            if (newRole != null && newRole != user.role) {
+                              await _adminViewModel.updateUserRole(user.uid, newRole);
+                              setState(() {
+                                _usersFuture = _adminViewModel.getUsers();
+                              });
+                            }
+                          },
+                          items: ['user', 'teacher'].map((String role) {
+                            return DropdownMenuItem<String>(
+                              value: role,
+                              child: Text(role.capitalize()),
+                            );
+                          }).toList(),
+                        ),
+                      );
+                    },
+                  );
                 }
-
-                return ListView.builder(
-                  itemCount: filteredUsers.length,
-                  itemBuilder: (context, index) {
-                    final userDoc = filteredUsers[index];
-                    final userData = userDoc.data() as Map<String, dynamic>;
-                    final user = UserModel.fromMap(userData);
-
-                    return UserEditCard(
-                      userId: userDoc.id,
-                      email: user.email,
-                      role: user.role,
-                    );
-                  },
-                );
               },
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class UserEditCard extends StatefulWidget {
-  final String userId;
-  final String email;
-  final String role;
-
-  const UserEditCard({
-    required this.userId,
-    required this.email,
-    required this.role,
-  });
-
-  @override
-  _UserEditCardState createState() => _UserEditCardState();
-}
-
-class _UserEditCardState extends State<UserEditCard> {
-  late String _currentRole;
-
-  @override
-  void initState() {
-    super.initState();
-    _currentRole = widget.role;
-  }
-
-  Future<void> _saveChanges() async {
-    try {
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(widget.userId)
-          .update({
-        'role': _currentRole,
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Role updated successfully!')),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error updating role: ${e.toString()}')),
-      );
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.all(8),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              widget.email,
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 12),
-
-            // Выбор роли
-            DropdownButtonFormField<String>(
-              value: _currentRole,
-              onChanged: (value) {
-                setState(() {
-                  _currentRole = value!;
-                });
-              },
-              items: ['user', 'teacher']
-                  .map((role) => DropdownMenuItem(
-                        value: role,
-                        child: Text(role.capitalize()),
-                      ))
-                  .toList(),
-              decoration: InputDecoration(
-                labelText: 'Role',
-              ),
-            ),
-
-            const SizedBox(height: 16),
-
-            ElevatedButton(
-              onPressed: _saveChanges,
-              child: Text('Save Changes'),
-            ),
-          ],
-        ),
       ),
     );
   }

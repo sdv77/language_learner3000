@@ -1,17 +1,40 @@
 import 'package:flutter/material.dart';
-import 'package:language_learner3000/views/pages_screen.dart';
-import 'package:language_learner3000/views/test_screen.dart';
 import '../models/lesson_model.dart';
+import '../views/test_screen.dart';
+import '../views/pages_screen.dart';
 
 class LessonDetailsScreen extends StatelessWidget {
   final Lesson lesson;
+  final String userId;
 
-  const LessonDetailsScreen({required this.lesson});
+  const LessonDetailsScreen({
+    required this.lesson,
+    required this.userId,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(lesson.title)),
+      appBar: AppBar(
+        title: Text(lesson.title),
+        actions: [
+          FutureBuilder<bool>(
+            future: _isLessonCompleted(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return SizedBox.shrink();
+              } else if (snapshot.hasError) {
+                return Icon(Icons.error, color: Colors.red);
+              } else {
+                bool isCompleted = snapshot.data ?? false;
+                return isCompleted
+                    ? Icon(Icons.check_circle, color: Colors.green)
+                    : SizedBox.shrink();
+              }
+            },
+          ),
+        ],
+      ),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -28,7 +51,6 @@ class LessonDetailsScreen extends StatelessWidget {
                   SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: () {
-                      // Переход к страницам урока
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -40,11 +62,14 @@ class LessonDetailsScreen extends StatelessWidget {
                   ),
                   ElevatedButton(
                     onPressed: () {
-                      // Открытие теста
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => TestScreen(pages: lesson.pages), // Передаем список LessonPage
+                          builder: (context) => TestScreen(
+                            pages: lesson.pages,
+                            userId: userId,
+                            lessonId: lesson.id,
+                          ),
                         ),
                       );
                     },
@@ -58,5 +83,10 @@ class LessonDetailsScreen extends StatelessWidget {
       ),
     );
   }
-}
 
+  Future<bool> _isLessonCompleted() async {
+    // Логика проверки завершения урока
+    // Например, используя UserViewModel
+    return false; // Замените на реальную проверку
+  }
+}

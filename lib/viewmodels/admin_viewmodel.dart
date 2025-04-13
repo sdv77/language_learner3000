@@ -11,7 +11,7 @@ class AdminViewModel {
       return querySnapshot.docs
           .where((doc) => doc.data() != null && (doc.data() as Map<String, dynamic>)['role'] != 'admin')
           .map((doc) {
-        return UserModel.fromMap(doc.data() as Map<String, dynamic>);
+        return UserModel.fromMap(doc.id, doc.data() as Map<String, dynamic>);
       }).toList();
     } catch (e) {
       print("Error fetching users: $e");
@@ -37,7 +37,7 @@ class AdminViewModel {
     return querySnapshot.docs
         .where((doc) => doc.data() != null && (doc.data() as Map<String, dynamic>)['role'] != 'admin')
         .map((doc) {
-      return UserModel.fromMap(doc.data() as Map<String, dynamic>);
+      return UserModel.fromMap(doc.id, doc.data() as Map<String, dynamic>);
     }).toList();
   } catch (e) {
     print("Error searching users: $e");

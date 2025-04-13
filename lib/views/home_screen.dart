@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
-import 'lessons_screen.dart';
+import '../views/lessons_screen.dart';
 
 class HomeScreen extends StatelessWidget {
+  final String userId;
+
+  const HomeScreen({required this.userId});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -15,7 +19,9 @@ class HomeScreen extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => LessonsScreen()),
+                  MaterialPageRoute(
+                    builder: (context) => LessonsScreen(userId: userId),
+                  ),
                 );
               },
               child: Text('View Lessons'),

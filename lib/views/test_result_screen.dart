@@ -1,21 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:language_learner3000/models/model_test.dart';
+import '../viewmodels/user_viewmodel.dart';
 
 class TestResultsScreen extends StatelessWidget {
   final int total;
   final int correct;
   final int incorrect;
   final List<TestWord> incorrectWords;
+  final String userId;
+  final String lessonId;
 
   const TestResultsScreen({
     required this.total,
     required this.correct,
     required this.incorrect,
     required this.incorrectWords,
+    required this.userId,
+    required this.lessonId,
   });
 
   @override
   Widget build(BuildContext context) {
+    final UserViewModel _userViewModel = UserViewModel();
+
+    void _markLessonAsCompleted() async {
+      await _userViewModel.addCompletedLesson(userId, lessonId);
+      Navigator.pop(context); // Возвращаемся на экран уроков
+    }
+
     return Scaffold(
       appBar: AppBar(title: Text('Test Results')),
       body: Padding(
@@ -44,9 +56,13 @@ class TestResultsScreen extends StatelessWidget {
             Spacer(),
             ElevatedButton(
               onPressed: () {
-                Navigator.pop(context); // Возвращаемся на экран уроков
+                if (incorrect == 0) {
+                  _markLessonAsCompleted(); // Добавляем урок в завершенные
+                } else {
+                  Navigator.pop(context); // Возвращаемся на экран уроков
+                }
               },
-              child: Text('Return to Lessons'),
+              child: Text(incorrect == 0 ? 'Mark as Completed' : 'Return to Lessons'),
             ),
           ],
         ),

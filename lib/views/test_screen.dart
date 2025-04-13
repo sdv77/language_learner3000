@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:language_learner3000/models/lesson_model.dart';
 import 'package:language_learner3000/models/model_test.dart';
 import 'package:language_learner3000/views/test_result_screen.dart';
 import '../viewmodels/test_viewmodel.dart';
+import '../models/lesson_model.dart';
 
 class TestScreen extends StatefulWidget {
-  final List<LessonPage> pages; // Изменено на List<LessonPage>
+  final List<LessonPage> pages;
+  final String userId;
+  final String lessonId;
 
-  const TestScreen({required this.pages});
+  const TestScreen({
+    required this.pages,
+    required this.userId,
+    required this.lessonId,
+  });
 
   @override
   _TestScreenState createState() => _TestScreenState();
@@ -38,13 +44,14 @@ class _TestScreenState extends State<TestScreen> {
   @override
   Widget build(BuildContext context) {
     if (_currentIndex >= _testWords.length) {
-      // Переход к результатам теста
       final results = _testViewModel.calculateResults(_testWords);
       return TestResultsScreen(
         total: results['total'],
         correct: results['correct'],
         incorrect: results['incorrect'],
         incorrectWords: results['incorrectWords'],
+        userId: widget.userId,
+        lessonId: widget.lessonId,
       );
     }
 

@@ -1,46 +1,50 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import '../models/user_model.dart';
 
 class AuthViewModel {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  Future<UserModel?> signIn(String email, String password) async {
+  Future<UserModel?> signIn(String email, String password, BuildContext context) async {
     try {
+      // Аутентификация через Firebase
       UserCredential userCredential = await _auth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
-      User? user = userCredential.user;
-      if (user != null && !user.emailVerified) {
-        throw Exception("Please verify your email before logging in.");
-      }
-      DocumentSnapshot userDoc =
-          await _firestore.collection('users').doc(user!.uid).get();
+
+      // Получение данных пользователя из Firestore
+      DocumentSnapshot userDoc = await _firestore.collection('users').doc(userCredential.user!.uid).get();
       if (userDoc.exists) {
-        return UserModel.fromMap(userDoc.data() as Map<String, dynamic>);
+        return UserModel.fromMap(userDoc.id, userDoc.data() as Map<String, dynamic>);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('User data not found in Firestore')),
+        );
+        return null;
       }
     } catch (e) {
       print("Error during sign in: $e");
       rethrow;
     }
-    return null;
   }
 
   Future<void> register(String email, String password, String role) async {
     try {
-      UserCredential userCredential =
-          await _auth.createUserWithEmailAndPassword(
+      // Регистрация нового пользователя
+      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
+
+      // Сохранение данных пользователя в Firestore
       await _firestore.collection('users').doc(userCredential.user!.uid).set({
-        'uid': userCredential.user!.uid,
         'email': email,
         'role': role,
+        'completedLessons': [],
       });
-      await userCredential.user!.sendEmailVerification(); // Отправляем письмо
     } catch (e) {
       print("Error during registration: $e");
       rethrow;
@@ -50,7 +54,7 @@ class AuthViewModel {
   Future<void> sendEmailVerification() async {
     try {
       User? user = _auth.currentUser;
-      if (user != null) {
+      if (user != null && !user.emailVerified) {
         await user.sendEmailVerification();
       }
     } catch (e) {
@@ -58,8 +62,4 @@ class AuthViewModel {
       rethrow;
     }
   }
-
-  Future<void> signOut() async {
-    await _auth.signOut();
-  }
-}
+} 
