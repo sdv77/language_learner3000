@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:language_learner3000/views/pages_screen.dart';
+import 'package:language_learner3000/views/test_screen.dart';
 import '../models/lesson_model.dart';
 
 class LessonDetailsScreen extends StatelessWidget {
@@ -38,11 +40,11 @@ class LessonDetailsScreen extends StatelessWidget {
                   ),
                   ElevatedButton(
                     onPressed: () {
-                      // Заглушка для теста
+                      // Открытие теста
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => TestPlaceholderScreen(),
+                          builder: (context) => TestScreen(pages: lesson.pages), // Передаем список LessonPage
                         ),
                       );
                     },
@@ -58,43 +60,3 @@ class LessonDetailsScreen extends StatelessWidget {
   }
 }
 
-class PagesScreen extends StatelessWidget {
-  final List<dynamic> pages;
-
-  const PagesScreen({required this.pages});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Lesson Pages')),
-      body: ListView.builder(
-        itemCount: pages.length,
-        itemBuilder: (context, index) {
-          var page = pages[index];
-          return Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              children: [
-                Image.network(page.imageUrl),
-                Text(page.englishWord, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                Text(page.russianTranslation, style: TextStyle(fontSize: 16, color: Colors.grey)),
-              ],
-            ),
-          );
-        },
-      ),
-    );
-  }
-}
-
-class TestPlaceholderScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Test Placeholder')),
-      body: Center(
-        child: Text('This is a placeholder for the test screen.'),
-      ),
-    );
-  }
-}
