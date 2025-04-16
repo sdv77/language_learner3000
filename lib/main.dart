@@ -27,7 +27,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'LangLearner',
-      theme: ThemeData(primarySwatch: Colors.blue),
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        brightness: Brightness.light, // Светлая тема
+        scaffoldBackgroundColor: Colors.grey[100],
+        appBarTheme: AppBarTheme(color: Colors.grey[100]) // Белый фон для всех экранов
+      ),
       home: SplashScreen(), // Начальный экран — SplashScreen
     );
   }

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart'; // Adjust import path
 import 'package:language_learner3000/viewmodels/auth_viewmodel.dart';
+import 'package:language_learner3000/views/lessons_screen.dart';
 import 'package:language_learner3000/views/register_screen.dart';
 import 'package:language_learner3000/widgets/auth_button.dart';
 import 'package:language_learner3000/widgets/auth_text_field.dart';
 
-import '../views/home_screen.dart';
 import '../views/teacher_screen.dart';
 import '../views/admin_screen.dart';
 import '../models/user_model.dart';
@@ -72,21 +72,23 @@ class _LoginScreenState extends State<LoginScreen>
   Widget _getScreenByRole(String role, String userId) {
     switch (role) {
       case 'user':
-        return HomeScreen(userId: userId);
+        return LessonsScreen(userId: userId);
       case 'teacher':
         return TeacherScreen(userId: userId);
       case 'admin':
         return AdminScreen();
       default:
-        return HomeScreen(userId: userId);
+        return LessonsScreen(userId: userId);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return SafeArea(
+      child: Scaffold(
       backgroundColor: Colors.grey[100], // Light background
-      body: Center(
+      body: Padding(padding: const EdgeInsets.all(16.0),
+      child: Center(
         child: FadeTransition(
           opacity: _animation,
           child: Padding(
@@ -103,7 +105,7 @@ class _LoginScreenState extends State<LoginScreen>
                     ),
                   const SizedBox(height: 24),
                   Text(
-                    'Welcome Back!',
+                    'Добро пожаловать!',
                     style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
@@ -114,19 +116,19 @@ class _LoginScreenState extends State<LoginScreen>
                   const SizedBox(height: 32),
                   AuthTextField(
                     controller: _emailController,
-                    labelText: 'Email',
+                    labelText: 'Эл. почта',
                     keyboardType: TextInputType.emailAddress,
                   ),
                   const SizedBox(height: 16),
                   AuthTextField(
                     controller: _passwordController,
-                    labelText: 'Password',
+                    labelText: 'Пароль',
                     obscureText: true,
                   ),
                   const SizedBox(height: 24),
                   AuthButton(
                     onPressed: _login,
-                    text: 'Login',
+                    text: 'Авторизоваться',
                   ),
                   const SizedBox(height: 16),
                   TextButton(
@@ -139,7 +141,7 @@ class _LoginScreenState extends State<LoginScreen>
                       );
                     },
                     child: Text(
-                      'Don\'t have an account? Register',
+                      'Нету аккаунта? Зарегистрируйтесь',
                       style: TextStyle(color: Theme.of(context).primaryColor),
                     ),
                   ),
@@ -149,6 +151,9 @@ class _LoginScreenState extends State<LoginScreen>
           ),
         ),
       ),
+    )
+  )
     );
+    
   }
 }

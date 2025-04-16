@@ -18,7 +18,10 @@ class ProfileScreen extends StatelessWidget {
     final AuthViewModel _authViewModel = AuthViewModel();
 
     return Scaffold(
-      appBar: AppBar(title: Text('👤 Profile')),
+      // appBar: AppBar(
+      //   title: Text('👤 Profile'),
+      //   centerTitle: true,
+      // ),
       body: FutureBuilder<UserModel?>(
         future: _userViewModel.getUser(userId),
         builder: (context, snapshot) {
@@ -32,51 +35,70 @@ class ProfileScreen extends StatelessWidget {
             UserModel user = snapshot.data!;
             int completedLessonsCount = user.completedLessons.length;
 
-            return Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center, // Center the content
-                children: [
-                  // Smiley Avatar
-                  Text(
-                    '😊', // You can replace this with a more elaborate smiley
-                    style: TextStyle(fontSize: 80),
+            return CustomScrollView(
+              slivers: [
+                SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Card(     
+                        color: Colors.white,         
+                        elevation: 4,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(20.0),
+                          child: Column(
+                            children: [
+                              Text(
+                                '😊',
+                                style: TextStyle(fontSize: 80),
+                              ),
+                              SizedBox(height: 10),
+                              // User Email
+                              Text(
+                                user.email,
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              SizedBox(height: 10),
+                              // Completed Lessons
+                              Text(
+                                'Выполненные уроки: $completedLessonsCount',
+                                style: TextStyle(fontSize: 16),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      TextButton(
+                        onPressed: () async {
+                          await _authViewModel.signOut();
+                          Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(builder: (context) => SplashScreen()),
+                            (route) => false,
+                          );
+                        },
+                        child: Text(
+                          'Выйти из аккаунта',
+                          style: TextStyle(
+                            color: Colors.red,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  SizedBox(height: 20),
-                  // User Email
-                  Text(
-                    user.email,
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(height: 10),
-                  // Completed Lessons
-                  Text(
-                    'Completed Lessons: $completedLessonsCount',
-                    style: TextStyle(fontSize: 16),
-                  ),
-                  Spacer(), // Push the logout button to the bottom
-                  // Logout Button
-                  ElevatedButton(
-                    onPressed: () async {
-                      await _authViewModel.signOut();
-                      Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => SplashScreen()),
-                        (route) => false,
-                      );
-                    },
-                    child: Text('Logout'),
-                    style: ElevatedButton.styleFrom(
-                      padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                      textStyle: TextStyle(fontSize: 18),
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             );
           }
         },

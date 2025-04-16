@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:language_learner3000/views/lessons_screen.dart';
 import '../viewmodels/auth_viewmodel.dart';
 import '../views/login_screen.dart';
-import '../views/home_screen.dart';
 import '../views/teacher_screen.dart';
 import '../views/admin_screen.dart';
 
@@ -52,13 +52,13 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget _getScreenByRole(String role, String userId) {
     switch (role) {
       case 'user':
-        return HomeScreen(userId: userId);
+        return LessonsScreen(userId: userId);
       case 'teacher':
         return TeacherScreen(userId: userId);
       case 'admin':
         return AdminScreen();
       default:
-        return HomeScreen(userId: userId);
+        return LessonsScreen(userId: userId);
     }
   }
 

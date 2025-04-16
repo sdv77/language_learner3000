@@ -40,7 +40,6 @@ class _CompletedLessonsScreenState extends State<CompletedLessonsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('✅ Completed Lessons')),
       body: FutureBuilder<List<Lesson>>(
         future: _completedLessonsFuture,
         builder: (context, snapshot) {
@@ -49,7 +48,7 @@ class _CompletedLessonsScreenState extends State<CompletedLessonsScreen> {
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text('No completed lessons.'));
+            return Center(child: Text('Вы пока что ничего не выполнили, пора приступать!😃'));
           } else {
             List<Lesson> lessons = snapshot.data!;
             return ListView.builder(

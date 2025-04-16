@@ -45,12 +45,12 @@ class _RegisterScreenState extends State<RegisterScreen>
         'user',
       );
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Account registered! Please verify your email.')),
+        SnackBar(content: Text('Аккаунт почти готов, подтвердите почту!')),
       );
       Navigator.pop(context); // Navigate back to login
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error during registration: $e')),
+        SnackBar(content: Text('Ошибка регистрации: $e')),
       );
     }
   }
@@ -59,11 +59,11 @@ class _RegisterScreenState extends State<RegisterScreen>
     try {
       await _authViewModel.sendEmailVerification();
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Verification email sent! Check your inbox.')),
+        SnackBar(content: Text('Письмо снова отправлено, дай Бог придет')),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error sending verification email: $e')),
+        SnackBar(content: Text('Ошибка регистрации: $e')),
       );
     }
   }
@@ -73,7 +73,7 @@ class _RegisterScreenState extends State<RegisterScreen>
     return Scaffold(
       backgroundColor: Colors.grey[100], // Light background
       appBar: AppBar(
-        title: Text('Create Account'),
+        title: Text('Регистрация'),
         backgroundColor: Colors.transparent,
         elevation: 0,
         iconTheme: IconThemeData(
@@ -97,7 +97,7 @@ class _RegisterScreenState extends State<RegisterScreen>
                     ),
                   const SizedBox(height: 24),
                   Text(
-                    'Join Us!',
+                    'Рады вас видеть!',
                     style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
@@ -108,25 +108,25 @@ class _RegisterScreenState extends State<RegisterScreen>
                   const SizedBox(height: 32),
                   AuthTextField(
                     controller: _emailController,
-                    labelText: 'Email',
+                    labelText: 'Эл. почта',
                     keyboardType: TextInputType.emailAddress,
                   ),
                   const SizedBox(height: 16),
                   AuthTextField(
                     controller: _passwordController,
-                    labelText: 'Password',
+                    labelText: 'Пароль',
                     obscureText: true,
                   ),
                   const SizedBox(height: 24),
                   AuthButton(
                     onPressed: _register,
-                    text: 'Register',
+                    text: 'Зарегистрироваться',
                   ),
                   const SizedBox(height: 16),
                   TextButton(
                     onPressed: _resendEmailVerification,
                     child: Text(
-                      'Resend Verification Email',
+                      'Мне не пришло письмо',
                       style: TextStyle(color: Theme.of(context).primaryColor),
                     ),
                   ),

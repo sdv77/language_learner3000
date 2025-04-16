@@ -15,6 +15,8 @@ class LessonCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      color: Colors.white,
+      elevation: 4,
       margin: EdgeInsets.all(8),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
