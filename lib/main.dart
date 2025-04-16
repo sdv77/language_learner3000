@@ -1,19 +1,24 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:language_learner3000/views/login_screen.dart';
+import 'views/splash_screen.dart';
 import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   try {
+    // Загрузка переменных окружения
     await dotenv.load(fileName: ".env");
+
+    // Инициализация Firebase
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
-    runApp(MaterialApp(home: LoginScreen()));
+
+    // Запуск приложения
+    runApp(MyApp());
   } catch (e) {
-    print(e.toString());
+    print("Error initializing app: $e");
   }
 }
 
@@ -23,8 +28,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'LangLearner',
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: LoginScreen(),
+      home: SplashScreen(), // Начальный экран — SplashScreen
     );
   }
 }
-

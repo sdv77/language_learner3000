@@ -1,20 +1,14 @@
-import 'package:flutter/material.dart'; // Adjust import path
+import 'package:flutter/material.dart';
 import 'package:language_learner3000/viewmodels/auth_viewmodel.dart';
-import 'package:language_learner3000/views/register_screen.dart';
 import 'package:language_learner3000/widgets/auth_button.dart';
-import 'package:language_learner3000/widgets/auth_text_field.dart';
+import 'package:language_learner3000/widgets/auth_text_field.dart'; // Adjust import path
 
-import '../views/home_screen.dart';
-import '../views/teacher_screen.dart';
-import '../views/admin_screen.dart';
-import '../models/user_model.dart';
-
-class LoginScreen extends StatefulWidget {
+class RegisterScreen extends StatefulWidget {
   @override
-  _LoginScreenState createState() => _LoginScreenState();
+  _RegisterScreenState createState() => _RegisterScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen>
+class _RegisterScreenState extends State<RegisterScreen>
     with SingleTickerProviderStateMixin {
   final AuthViewModel _authViewModel = AuthViewModel();
   final TextEditingController _emailController = TextEditingController();
@@ -43,42 +37,34 @@ class _LoginScreenState extends State<LoginScreen>
     super.dispose();
   }
 
-  Future<void> _login() async {
+  Future<void> _register() async {
     try {
-      UserModel? user = await _authViewModel.signIn(
+      await _authViewModel.register(
         _emailController.text.trim(),
         _passwordController.text.trim(),
-        context,
+        'user',
       );
-      if (user != null) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => _getScreenByRole(user.role, user.uid),
-          ),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Invalid credentials')),
-        );
-      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Account registered! Please verify your email.')),
+      );
+      Navigator.pop(context); // Navigate back to login
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error during login: $e')),
+        SnackBar(content: Text('Error during registration: $e')),
       );
     }
   }
 
-  Widget _getScreenByRole(String role, String userId) {
-    switch (role) {
-      case 'user':
-        return HomeScreen(userId: userId);
-      case 'teacher':
-        return TeacherScreen(userId: userId);
-      case 'admin':
-        return AdminScreen();
-      default:
-        return HomeScreen(userId: userId);
+  Future<void> _resendEmailVerification() async {
+    try {
+      await _authViewModel.sendEmailVerification();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Verification email sent! Check your inbox.')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error sending verification email: $e')),
+      );
     }
   }
 
@@ -86,6 +72,14 @@ class _LoginScreenState extends State<LoginScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[100], // Light background
+      appBar: AppBar(
+        title: Text('Create Account'),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        iconTheme: IconThemeData(
+          color: Colors.grey[800], // Darker back arrow
+        ),
+      ),
       body: Center(
         child: FadeTransition(
           opacity: _animation,
@@ -97,13 +91,13 @@ class _LoginScreenState extends State<LoginScreen>
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
                     const Text(
-                      '👋', // Waving hand emoji
+                      '✨', // Sparkle emoji
                       style: TextStyle(fontSize: 60),
                       textAlign: TextAlign.center,
                     ),
                   const SizedBox(height: 24),
                   Text(
-                    'Welcome Back!',
+                    'Join Us!',
                     style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
@@ -125,21 +119,14 @@ class _LoginScreenState extends State<LoginScreen>
                   ),
                   const SizedBox(height: 24),
                   AuthButton(
-                    onPressed: _login,
-                    text: 'Login',
+                    onPressed: _register,
+                    text: 'Register',
                   ),
                   const SizedBox(height: 16),
                   TextButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => RegisterScreen(),
-                        ),
-                      );
-                    },
+                    onPressed: _resendEmailVerification,
                     child: Text(
-                      'Don\'t have an account? Register',
+                      'Resend Verification Email',
                       style: TextStyle(color: Theme.of(context).primaryColor),
                     ),
                   ),

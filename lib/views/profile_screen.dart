@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../viewmodels/user_viewmodel.dart';
+import '../viewmodels/auth_viewmodel.dart';
 import '../models/user_model.dart';
+import '../views/splash_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   final String userId;
@@ -10,6 +12,7 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final UserViewModel _userViewModel = UserViewModel();
+    final AuthViewModel _authViewModel = AuthViewModel();
 
     return Scaffold(
       appBar: AppBar(title: Text('Profile')),
@@ -49,6 +52,18 @@ class ProfileScreen extends StatelessWidget {
                   Text(
                     '$completedLessonsCount',
                     style: TextStyle(fontSize: 16),
+                  ),
+                  Spacer(),
+                  ElevatedButton(
+                    onPressed: () async {
+                      await _authViewModel.signOut();
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(builder: (context) => SplashScreen()),
+                        (route) => false, // Очищаем весь стек навигации
+                      );
+                    },
+                    child: Text('Выйти из аккаунта'),
                   ),
                 ],
               ),

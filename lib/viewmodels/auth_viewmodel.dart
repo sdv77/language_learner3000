@@ -7,24 +7,23 @@ class AuthViewModel {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
+  // Публичный геттер для _auth
+  FirebaseAuth get auth => _auth;
+
+  // Публичный геттер для _firestore
+  FirebaseFirestore get firestore => _firestore;
+
   Future<UserModel?> signIn(String email, String password, BuildContext context) async {
     try {
-      // Аутентификация через Firebase
       UserCredential userCredential = await _auth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
-
-      // Получение данных пользователя из Firestore
       DocumentSnapshot userDoc = await _firestore.collection('users').doc(userCredential.user!.uid).get();
       if (userDoc.exists) {
         return UserModel.fromMap(userDoc.id, userDoc.data() as Map<String, dynamic>);
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('User data not found in Firestore')),
-        );
-        return null;
       }
+      return null;
     } catch (e) {
       print("Error during sign in: $e");
       rethrow;
@@ -33,13 +32,10 @@ class AuthViewModel {
 
   Future<void> register(String email, String password, String role) async {
     try {
-      // Регистрация нового пользователя
       UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
-
-      // Сохранение данных пользователя в Firestore
       await _firestore.collection('users').doc(userCredential.user!.uid).set({
         'email': email,
         'role': role,
@@ -62,4 +58,18 @@ class AuthViewModel {
       rethrow;
     }
   }
-} 
+
+  Future<bool> isUserLoggedIn() async {
+    User? user = _auth.currentUser;
+    return user != null;
+  }
+
+  Future<void> signOut() async {
+    try {
+      await _auth.signOut();
+    } catch (e) {
+      print("Error signing out: $e");
+      rethrow;
+    }
+  }
+}
