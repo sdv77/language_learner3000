@@ -3,6 +3,10 @@ import 'package:language_learner3000/views/lesson_detail_screen.dart';
 import '../viewmodels/lesson_viewmodel.dart';
 import '../viewmodels/user_viewmodel.dart';
 import '../models/lesson_model.dart';
+import '../widgets/lesson_card.dart';
+import '../widgets/bottom_nav_bar.dart';
+import 'lessons_screen.dart';
+import 'profile_screen.dart';
 
 class CompletedLessonsScreen extends StatefulWidget {
   final String userId;
@@ -25,15 +29,18 @@ class _CompletedLessonsScreenState extends State<CompletedLessonsScreen> {
   }
 
   Future<List<Lesson>> _fetchCompletedLessons() async {
-    List<String> completedLessonIds = await _userViewModel.getCompletedLessons(widget.userId);
+    List<String> completedLessonIds =
+        await _userViewModel.getCompletedLessons(widget.userId);
     List<Lesson> allLessons = await _lessonViewModel.getLessons();
-    return allLessons.where((lesson) => completedLessonIds.contains(lesson.id)).toList();
+    return allLessons
+        .where((lesson) => completedLessonIds.contains(lesson.id))
+        .toList();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Completed Lessons')),
+      appBar: AppBar(title: Text('✅ Completed Lessons')),
       body: FutureBuilder<List<Lesson>>(
         future: _completedLessonsFuture,
         builder: (context, snapshot) {
@@ -49,27 +56,46 @@ class _CompletedLessonsScreenState extends State<CompletedLessonsScreen> {
               itemCount: lessons.length,
               itemBuilder: (context, index) {
                 Lesson lesson = lessons[index];
-                return Card(
-                  margin: EdgeInsets.all(8),
-                  child: ListTile(
-                    leading: Image.network(lesson.imageUrl),
-                    title: Text(lesson.title),
-                    subtitle: Text(lesson.description),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => LessonDetailsScreen(
-                            lesson: lesson,
-                            userId: widget.userId,
-                          ),
+                return LessonCard(
+                  lesson: lesson,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => LessonDetailsScreen(
+                          lesson: lesson,
+                          userId: widget.userId,
                         ),
-                      );
-                    },
-                    trailing: Icon(Icons.check_circle, color: Colors.green),
-                  ),
+                      ),
+                    );
+                  },
+                  trailing: Icon(Icons.check_circle, color: Colors.green),
                 );
               },
+            );
+          }
+        },
+      ),
+      bottomNavigationBar: BottomNavBar(
+        currentIndex: 1,
+        onTap: (index) {
+          if (index == 0) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => LessonsScreen(
+                  userId: widget.userId,
+                ),
+              ),
+            );
+          } else if (index == 2) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ProfileScreen(
+                  userId: widget.userId,
+                ),
+              ),
             );
           }
         },
