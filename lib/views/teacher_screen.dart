@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:language_learner3000/views/add_video_screen.dart';
+import 'package:language_learner3000/views/home_screen.dart';
 import '../views/add_lesson_screen.dart';
 import '../views/lessons_screen.dart';
 import '../views/profile_screen.dart';
@@ -47,6 +49,28 @@ class TeacherScreen extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                     builder: (context) => LessonsScreen(userId: userId),
+                  ),
+                );
+              },
+              child: Text('View Lessons'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AddVideoScreen(),
+                  ),
+                );
+              },
+              child: Text('View Lessons'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => HomeScreen(),
                   ),
                 );
               },
