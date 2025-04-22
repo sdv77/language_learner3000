@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:language_learner3000/views/add_video_screen.dart';
+import 'package:language_learner3000/views/video_player_screen.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -43,45 +44,6 @@ class HomeScreen extends StatelessWidget {
           );
         },
         child: Icon(Icons.add),
-      ),
-    );
-  }
-}
-
-class VideoPlayerScreen extends StatefulWidget {
-  final DocumentSnapshot video;
-
-  VideoPlayerScreen({required this.video});
-
-  @override
-  _VideoPlayerScreenState createState() => _VideoPlayerScreenState();
-}
-
-class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
-  late YoutubePlayerController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    final videoId = YoutubePlayer.convertUrlToId(widget.video['url']);
-    _controller = YoutubePlayerController(
-      initialVideoId: videoId!,
-      flags: YoutubePlayerFlags(autoPlay: true),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text(widget.video['title'])),
-      body: Column(
-        children: [
-          YoutubePlayer(controller: _controller),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Text(widget.video['description']),
-          ),
-        ],
       ),
     );
   }
