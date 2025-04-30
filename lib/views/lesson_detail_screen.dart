@@ -36,14 +36,6 @@ class LessonDetailsScreen extends StatelessWidget {
                   // Ratings and Best Seller
                   Row(
                     children: [
-                      Icon(Icons.star, size: 16, color: Colors.blue),
-                      SizedBox(width: 4),
-                      Text('4.569', style: TextStyle(fontSize: 14)),
-                      SizedBox(width: 8),
-                      Icon(Icons.star_border, size: 16, color: Colors.blue),
-                      SizedBox(width: 4),
-                      Text('4.9', style: TextStyle(fontSize: 14)),
-                      SizedBox(width: 8),
                       Container(
                         padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
@@ -51,7 +43,7 @@ class LessonDetailsScreen extends StatelessWidget {
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
-                          'Best Seller',
+                          'Топ урок',
                           style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                         ),
                       ),
@@ -74,15 +66,15 @@ class LessonDetailsScreen extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('24 Lessons (20 hours)',
+                      Text('2 слова',
                           style: TextStyle(fontSize: 16)),
-                      Text('See all',
+                      Text('Посмотреть все',
                           style: TextStyle(fontSize: 16, color: Colors.blue)),
                     ],
                   ),
                   SizedBox(height: 16),
                   // Individual Lessons
-                  _buildLessonItem(context, 'Introduction to 3D', '20 mins'),
+                  _buildLessonItem(context, 'Крутой', 'Урок'),
                 ],
               ),
             ),
@@ -102,7 +94,7 @@ class LessonDetailsScreen extends StatelessWidget {
                         ),
                       );
                     },
-                child: Text('Enroll - \$24.99'),
+                child: Text('Пройти тест'),
                 style: ElevatedButton.styleFrom(
                   minimumSize: Size(double.infinity, 50),
                   padding: EdgeInsets.symmetric(vertical: 16),

@@ -33,7 +33,7 @@ class TeacherScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text('Welcome, Teacher!'),
+            Text('Добро пожаловать, учитель!'),
             ElevatedButton(
               onPressed: () {
                 Navigator.push(
@@ -41,7 +41,7 @@ class TeacherScreen extends StatelessWidget {
                   MaterialPageRoute(builder: (context) => AddLessonScreen()),
                 );
               },
-              child: Text('Add Lesson'),
+              child: Text('Добавить урок'),
             ),
             ElevatedButton(
               onPressed: () {
@@ -52,7 +52,7 @@ class TeacherScreen extends StatelessWidget {
                   ),
                 );
               },
-              child: Text('View Lessons'),
+              child: Text('Посмотреть уроки'),
             ),
             ElevatedButton(
               onPressed: () {
@@ -63,7 +63,7 @@ class TeacherScreen extends StatelessWidget {
                   ),
                 );
               },
-              child: Text('View Lessons'),
+              child: Text('Добавить видео'),
             ),
             ElevatedButton(
               onPressed: () {
@@ -74,7 +74,7 @@ class TeacherScreen extends StatelessWidget {
                   ),
                 );
               },
-              child: Text('View Lessons'),
+              child: Text('Посмотреть видео'),
             ),
           ],
         ),
