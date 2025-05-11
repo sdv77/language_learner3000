@@ -15,11 +15,15 @@ dependencies:
   cloud_firestore: ^5.6.6
   youtube_player_flutter: ^9.1.1
   provider: ^6.1.4
+  fl_chart: ^0.70.0
+  intl: ^0.18.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
+   # Добавьте эту строку, если её нет
+ 
 
 flutter:
   uses-material-design: true

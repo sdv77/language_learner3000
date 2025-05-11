@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/animation.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:intl/intl.dart';
 
 class UserModel {
   final String uid;
@@ -52,6 +53,7 @@ class ManageUsersScreen extends StatefulWidget {
 
 class _ManageUsersScreenState extends State<ManageUsersScreen> with SingleTickerProviderStateMixin {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   final TextEditingController _searchController = TextEditingController();
   
   List<UserModel> _users = [];
@@ -88,18 +90,58 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> with SingleTicker
       final snapshot = await _firestore.collection('users').get();
       _users = snapshot.docs.map((doc) => UserModel.fromFirestore(doc)).toList();
     } catch (e) {
-      print('Ошибка загрузки: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Ошибка загрузки пользователей'),
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-        ),
-      );
+      _showErrorSnackbar('Ошибка загрузки пользователей: $e');
+    } finally {
+      setState(() => _isLoading = false);
     }
-    setState(() => _isLoading = false);
+  }
+
+  void _showErrorSnackbar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+      ),
+    );
+  }
+
+  void _showSuccessSnackbar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.green,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _logRoleChange({
+    required String userId,
+    required String userEmail,
+    required String oldRole,
+    required String newRole,
+  }) async {
+    try {
+      final currentUser = _auth.currentUser;
+      await _firestore.collection('role_change_logs').add({
+        'userId': userId,
+        'userEmail': userEmail,
+        'oldRole': oldRole,
+        'newRole': newRole,
+        'changedBy': currentUser?.email ?? 'system',
+        'changeDate': DateTime.now().toIso8601String(),
+        'formattedDate': DateFormat('dd.MM.yyyy HH:mm').format(DateTime.now()),
+      });
+    } catch (e) {
+      debugPrint('Ошибка логирования: $e');
+    }
   }
 
   List<UserModel> _getFilteredUsers() {
@@ -111,55 +153,178 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> with SingleTicker
     }).toList();
   }
 
+  Future<void> _confirmRoleUpdate(String userId, String newRole) async {
+    final user = _users.firstWhere((u) => u.uid == userId);
+    final oldRole = user.role;
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: EdgeInsets.all(20),
+        child: Container(
+          padding: EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 20,
+                offset: Offset(0, 10),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.warning_amber_rounded,
+                color: Colors.orange,
+                size: 60,
+              ),
+              SizedBox(height: 20),
+              Text(
+                "Подтвердите изменение роли",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(height: 15),
+              Text(
+                "Вы собираетесь изменить роль пользователя на",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.grey.shade600,
+                ),
+              ),
+              SizedBox(height: 5),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: _getRoleColor(newRole).withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: _getRoleColor(newRole),
+                    width: 1.5,
+                  ),
+                ),
+                child: Text(
+                  _getRoleName(newRole),
+                  style: TextStyle(
+                    color: _getRoleColor(newRole),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+              SizedBox(height: 25),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.pop(context, false),
+                      style: OutlinedButton.styleFrom(
+                        padding: EdgeInsets.symmetric(vertical: 15),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        side: BorderSide(color: Colors.grey.shade300),
+                      ),
+                      child: Text(
+                        "Отмена",
+                        style: TextStyle(
+                          color: Colors.grey.shade700,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 15),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.pop(context, true),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        padding: EdgeInsets.symmetric(vertical: 15),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: Text(
+                        "Подтвердить",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    if (confirmed == true) {
+      await _updateUserRole(userId, newRole);
+    }
+  }
+
   Future<void> _updateUserRole(String userId, String newRole) async {
     try {
-      const validRoles = ['user', 'teacher', 'admin'];
-      if (!validRoles.contains(newRole)) {
-        throw Exception('Недопустимая роль');
-      }
+      final user = _users.firstWhere((u) => u.uid == userId);
+      final oldRole = user.role;
 
       await _firestore.collection('users').doc(userId).update({
         'role': newRole,
       });
 
+      await _logRoleChange(
+        userId: userId,
+        userEmail: user.email,
+        oldRole: oldRole,
+        newRole: newRole,
+      );
+
       setState(() {
-        final index = _users.indexWhere((user) => user.uid == userId);
+        final index = _users.indexWhere((u) => u.uid == userId);
         if (index != -1) {
           _users[index] = _users[index].copyWith(role: newRole);
         }
       });
       
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Роль успешно изменена'),
-          backgroundColor: Colors.green,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-        ),
-      );
+      _showSuccessSnackbar('Роль успешно изменена');
     } catch (e) {
-      print('Ошибка изменения роли: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Ошибка: ${e.toString()}'),
-          backgroundColor: Colors.red,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-        ),
-      );
+      _showErrorSnackbar('Ошибка: ${e.toString()}');
+    }
+  }
+
+  Color _getRoleColor(String role) {
+    switch (role) {
+      case 'admin': return Colors.deepPurple;
+      case 'teacher': return Colors.blue;
+      default: return Colors.green;
+    }
+  }
+
+  String _getRoleName(String role) {
+    switch (role) {
+      case 'admin': return 'Админ';
+      case 'teacher': return 'Учитель';
+      default: return 'Студент';
     }
   }
 
   Widget _buildRoleChip(String role) {
-    final color = role == 'admin'
-        ? Colors.deepPurple
-        : role == 'teacher'
-            ? Colors.blue
-            : Colors.green;
+    final color = _getRoleColor(role);
     
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -169,11 +334,7 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> with SingleTicker
         border: Border.all(color: color),
       ),
       child: Text(
-        role == 'admin'
-            ? 'Админ'
-            : role == 'teacher'
-                ? 'Учитель'
-                : 'Студент',
+        _getRoleName(role),
         style: TextStyle(
           color: color,
           fontWeight: FontWeight.bold,
@@ -402,7 +563,7 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> with SingleTicker
                                     ),
                                     PopupMenuButton<String>(
                                       icon: Icon(Icons.more_vert),
-                                      onSelected: (newRole) => _updateUserRole(user.uid, newRole),
+                                      onSelected: (newRole) => _confirmRoleUpdate(user.uid, newRole),
                                       itemBuilder: (context) => [
                                         PopupMenuItem(
                                           value: 'user',
