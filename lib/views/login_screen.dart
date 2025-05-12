@@ -1,4 +1,6 @@
-import 'package:flutter/material.dart'; // Adjust import path
+// login_screen.dart
+
+import 'package:flutter/material.dart';
 import 'package:language_learner3000/viewmodels/auth_viewmodel.dart';
 import 'package:language_learner3000/views/lessons_screen.dart';
 import 'package:language_learner3000/views/register_screen.dart';
@@ -48,8 +50,8 @@ class _LoginScreenState extends State<LoginScreen>
       UserModel? user = await _authViewModel.signIn(
         _emailController.text.trim(),
         _passwordController.text.trim(),
-        context,
-      );
+      ); // ← Удалили context
+
       if (user != null) {
         Navigator.pushReplacement(
           context,
@@ -86,74 +88,74 @@ class _LoginScreenState extends State<LoginScreen>
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-      backgroundColor: Colors.grey[100], // Light background
-      body: Padding(padding: const EdgeInsets.all(16.0),
-      child: Center(
-        child: FadeTransition(
-          opacity: _animation,
-          child: Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                    const Text(
-                      '👋', // Waving hand emoji
-                      style: TextStyle(fontSize: 60),
-                      textAlign: TextAlign.center,
-                    ),
-                  const SizedBox(height: 24),
-                  Text(
-                    'Добро пожаловать!',
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey[800], // Darker text
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 32),
-                  AuthTextField(
-                    controller: _emailController,
-                    labelText: 'Эл. почта',
-                    keyboardType: TextInputType.emailAddress,
-                  ),
-                  const SizedBox(height: 16),
-                  AuthTextField(
-                    controller: _passwordController,
-                    labelText: 'Пароль',
-                    obscureText: true,
-                  ),
-                  const SizedBox(height: 24),
-                  AuthButton(
-                    onPressed: _login,
-                    text: 'Авторизоваться',
-                  ),
-                  const SizedBox(height: 16),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => RegisterScreen(),
+        backgroundColor: Colors.grey[100], // Light background
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Center(
+            child: FadeTransition(
+              opacity: _animation,
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: <Widget>[
+                      const Text(
+                        '👋', // Waving hand emoji
+                        style: TextStyle(fontSize: 60),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 24),
+                      Text(
+                        'Добро пожаловать!',
+                        style: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.grey[800], // Darker text
                         ),
-                      );
-                    },
-                    child: Text(
-                      'Нету аккаунта? Зарегистрируйтесь',
-                      style: TextStyle(color: Theme.of(context).primaryColor),
-                    ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 32),
+                      AuthTextField(
+                        controller: _emailController,
+                        labelText: 'Эл. почта',
+                        keyboardType: TextInputType.emailAddress,
+                      ),
+                      const SizedBox(height: 16),
+                      AuthTextField(
+                        controller: _passwordController,
+                        labelText: 'Пароль',
+                        obscureText: true,
+                      ),
+                      const SizedBox(height: 24),
+                      AuthButton(
+                        onPressed: _login,
+                        text: 'Авторизоваться',
+                      ),
+                      const SizedBox(height: 16),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => RegisterScreen(),
+                            ),
+                          );
+                        },
+                        child: Text(
+                          'Нету аккаунта? Зарегистрируйтесь',
+                          style: TextStyle(color: Theme.of(context).primaryColor),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
           ),
         ),
       ),
-    )
-  )
     );
-    
   }
 }

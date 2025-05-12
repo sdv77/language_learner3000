@@ -1,7 +1,9 @@
+// register_screen.dart
+
 import 'package:flutter/material.dart';
 import 'package:language_learner3000/viewmodels/auth_viewmodel.dart';
 import 'package:language_learner3000/widgets/auth_button.dart';
-import 'package:language_learner3000/widgets/auth_text_field.dart'; // Adjust import path
+import 'package:language_learner3000/widgets/auth_text_field.dart';
 
 class RegisterScreen extends StatefulWidget {
   @override
@@ -42,12 +44,12 @@ class _RegisterScreenState extends State<RegisterScreen>
       await _authViewModel.register(
         _emailController.text.trim(),
         _passwordController.text.trim(),
-        'user',
+        'user', // роль по умолчанию
       );
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Аккаунт почти готов, подтвердите почту!')),
       );
-      Navigator.pop(context); // Navigate back to login
+      Navigator.pop(context); // Вернуться к экрану входа
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Ошибка регистрации: $e')),
@@ -71,13 +73,13 @@ class _RegisterScreenState extends State<RegisterScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100], // Light background
+      backgroundColor: Colors.grey[100],
       appBar: AppBar(
         title: Text('Регистрация'),
         backgroundColor: Colors.transparent,
         elevation: 0,
         iconTheme: IconThemeData(
-          color: Colors.grey[800], // Darker back arrow
+          color: Colors.grey[800],
         ),
       ),
       body: Center(
@@ -90,18 +92,18 @@ class _RegisterScreenState extends State<RegisterScreen>
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
-                    const Text(
-                      '✨', // Sparkle emoji
-                      style: TextStyle(fontSize: 60),
-                      textAlign: TextAlign.center,
-                    ),
+                  const Text(
+                    '✨',
+                    style: TextStyle(fontSize: 60),
+                    textAlign: TextAlign.center,
+                  ),
                   const SizedBox(height: 24),
                   Text(
                     'Рады вас видеть!',
                     style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
-                      color: Colors.grey[800], // Darker text
+                      color: Colors.grey[800],
                     ),
                     textAlign: TextAlign.center,
                   ),
